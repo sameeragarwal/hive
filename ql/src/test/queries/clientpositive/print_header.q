@@ -9,5 +9,5 @@ SELECT src1.key as k1, src1.value as v1,
   SORT BY k1, v1, k2, v2
   LIMIT 10;
 
-SELECT src.key, sum(substr(src.value,5)) FROM src GROUP BY src.key LIMIT 10;
+SELECT src.key, sum(substr(src.value,5)) FROM src GROUP BY src.key order by key LIMIT 10;
 
