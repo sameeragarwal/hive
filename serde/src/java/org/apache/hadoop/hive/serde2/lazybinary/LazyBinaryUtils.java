@@ -122,8 +122,6 @@ public final class LazyBinaryUtils {
     }
   }
 
-  static VInt vInt = new LazyBinaryUtils.VInt();
-
   /**
    * Check a particular field and set its size and offset in bytes based on the
    * field type and the bytes arrays.
@@ -144,7 +142,7 @@ public final class LazyBinaryUtils {
    *          modify this byteinfo object and return it
    */
   public static void checkObjectByteInfo(ObjectInspector objectInspector,
-      byte[] bytes, int offset, RecordInfo recordInfo) {
+					 byte[] bytes, int offset, RecordInfo recordInfo, VInt vInt) {
     Category category = objectInspector.getCategory();
     switch (category) {
     case PRIMITIVE:
