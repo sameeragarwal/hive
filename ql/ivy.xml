@@ -28,6 +28,8 @@
   <dependencies>
     <dependency org="edu.berkeley.cs.shark" name="hive-metastore" rev="${version}"
                 conf="compile->default" />
+    <dependency org="org.apache.mina" name="mina-core" rev="${mina.version}"
+                conf="test->default" />
     <dependency org="edu.berkeley.cs.shark" name="hive-hbase-handler" rev="${version}"
                 conf="test->default" transitive="false"/>
     <dependency org="edu.berkeley.cs.shark" name="hive-contrib" rev="${version}"
