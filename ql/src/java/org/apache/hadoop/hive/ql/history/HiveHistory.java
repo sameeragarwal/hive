@@ -416,6 +416,9 @@ public class HiveHistory {
   public void printRowCount(String queryId) {
     QueryInfo ji = queryInfoMap.get(queryId);
     synchronized(ji) {
+    	if (ji == null) {
+    		return;
+    	}
 	    for (String tab : ji.rowCountMap.keySet()) {
 	      console.printInfo(ji.rowCountMap.get(tab) + " Rows loaded to " + tab);
 	    }
