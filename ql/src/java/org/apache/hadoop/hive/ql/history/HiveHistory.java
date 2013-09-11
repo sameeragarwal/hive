@@ -415,10 +415,10 @@ public class HiveHistory {
 
   public void printRowCount(String queryId) {
     QueryInfo ji = queryInfoMap.get(queryId);
+    if (ji == null) {
+      return;
+    }
     synchronized(ji) {
-    	if (ji == null) {
-    		return;
-    	}
 	    for (String tab : ji.rowCountMap.keySet()) {
 	      console.printInfo(ji.rowCountMap.get(tab) + " Rows loaded to " + tab);
 	    }
@@ -432,10 +432,10 @@ public class HiveHistory {
    */
   public void endQuery(String queryId) {
     QueryInfo ji = queryInfoMap.get(queryId);
+    if (ji == null) {
+      return;
+    }
     synchronized(ji) {
-	    if (ji == null) {
-	      return;
-	    }
 	    log(RecordTypes.QueryEnd, ji.hm);
     }
     queryInfoMap.remove(queryId);
