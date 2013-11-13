@@ -55,6 +55,7 @@ public class QBParseInfo {
   private boolean isAnalyzeCommand; // used for the analyze command (statistics)
   private boolean isInsertToTable;  // used for insert overwrite command (statistics)
 
+  private final HashMap<String, ASTNode> destToSampleExpr; // used for sampling
   private final HashMap<String, tableSpec> tableSpecs; // used for statistics
 
   /**
@@ -105,6 +106,7 @@ public class QBParseInfo {
     destToOrderby = new HashMap<String, ASTNode>();
     destToLimit = new HashMap<String, Integer>();
     insertIntoTables = new HashSet<String>();
+    destToSampleExpr = new HashMap<String, ASTNode>();
 
     destToAggregationExprs = new LinkedHashMap<String, LinkedHashMap<String, ASTNode>>();
     destToDistinctFuncExprs = new HashMap<String, List<ASTNode>>();
@@ -154,6 +156,10 @@ public class QBParseInfo {
 
   public void setSelExprForClause(String clause, ASTNode ast) {
     destToSelExpr.put(clause, ast);
+  }
+
+  public void setSampleExprForClause(String clause, ASTNode ast) {
+    destToSampleExpr.put(clause, ast);
   }
 
   public void setWhrExprForClause(String clause, ASTNode ast) {
@@ -226,6 +232,14 @@ public class QBParseInfo {
 
   public ASTNode getDestForClause(String clause) {
     return nameToDest.get(clause);
+  }
+
+  public ASTNode getSampleForClause(String clause) {
+    return destToSampleExpr.get(clause);
+  }
+
+  public HashMap<String, ASTNode> getDestToSampleExpr() {
+    return destToSampleExpr;
   }
 
   public ASTNode getWhrForClause(String clause) {
