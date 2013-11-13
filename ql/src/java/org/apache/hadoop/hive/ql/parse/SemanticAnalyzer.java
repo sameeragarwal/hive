@@ -113,6 +113,7 @@ import org.apache.hadoop.hive.ql.optimizer.ppr.PartitionPruner;
 import org.apache.hadoop.hive.ql.optimizer.unionproc.UnionProcContext;
 import org.apache.hadoop.hive.ql.parse.BaseSemanticAnalyzer.tableSpec.SpecType;
 import org.apache.hadoop.hive.ql.plan.AggregationDesc;
+import org.apache.hadoop.hive.ql.plan.BernoulliSampleDesc;
 import org.apache.hadoop.hive.ql.plan.CreateTableDesc;
 import org.apache.hadoop.hive.ql.plan.CreateTableLikeDesc;
 import org.apache.hadoop.hive.ql.plan.CreateViewDesc;
@@ -1554,6 +1555,13 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     return genFilterPlan(qb, (ASTNode) whereExpr.getChild(0), input);
   }
 
+  @SuppressWarnings("nls")
+  private Operator genBernoulliSamplePlan(String dest, QB qb, Operator input)
+      throws SemanticException {
+    ASTNode sampleExpr = qb.getParseInfo().getSampleForClause(dest);
+    return genBernoulliSamplePlan(qb, (ASTNode) sampleExpr.getChild(0), input);
+  }
+
   /**
    * create a filter plan. The condition and the inputs are specified.
    *
@@ -1577,6 +1585,35 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     if (LOG.isDebugEnabled()) {
       LOG.debug("Created Filter Plan for " + qb.getId() + " row schema: "
                 + inputRR.toString());
+    }
+    return output;
+  }
+
+  /**
+   * create a bernoulli sample plan. The condition and the inputs are specified.
+   *
+   * @param qb
+   *          current query block
+   * @param condn
+   *          The condition to be resolved
+   * @param input
+   *          the input operator
+   */
+  @SuppressWarnings("nls")
+  private Operator genBernoulliSamplePlan(QB qb, ASTNode condn, Operator input)
+      throws SemanticException {
+
+    OpParseContext inputCtx = opParseCtx.get(input);
+    RowResolver inputRR = inputCtx.getRowResolver();
+
+    Operator output = putOpInsertMap(OperatorFactory.getAndMakeChild(
+        new BernoulliSampleDesc(Double.parseDouble(condn.token.getText()), false),
+        new RowSchema(inputRR.getColumnInfos()), input),
+        inputRR);
+
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Created Sample Plan for " + qb.getId() + " row schema: "
+          + inputRR.toString());
     }
     return output;
   }
@@ -6113,6 +6150,10 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
 
               if (qbp.getWhrForClause(dest) != null) {
                 curr = genFilterPlan(dest, qb, curr);
+              }
+
+              if (qbp.getSampleForClause(dest) != null) {
+                curr = genBernoulliSamplePlan(dest, qb, curr);
               }
 
               if (qbp.getAggregationExprsForClause(dest).size() != 0
