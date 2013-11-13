@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.hadoop.hive.ql.plan.BernoulliSampleDesc;
 import org.apache.hadoop.hive.ql.plan.CollectDesc;
 import org.apache.hadoop.hive.ql.plan.ExtractDesc;
 import org.apache.hadoop.hive.ql.plan.FileSinkDesc;
@@ -68,6 +69,7 @@ public final class OperatorFactory {
   static {
     opvec = new ArrayList<OpTuple>();
     opvec.add(new OpTuple<FilterDesc>(FilterDesc.class, FilterOperator.class));
+    opvec.add(new OpTuple<BernoulliSampleDesc>(BernoulliSampleDesc.class, BernoulliSamplingOperator.class));
     opvec.add(new OpTuple<SelectDesc>(SelectDesc.class, SelectOperator.class));
     opvec.add(new OpTuple<ForwardDesc>(ForwardDesc.class, ForwardOperator.class));
     opvec.add(new OpTuple<FileSinkDesc>(FileSinkDesc.class, FileSinkOperator.class));
