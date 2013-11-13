@@ -179,6 +179,7 @@ TOK_TABLELOCATION;
 TOK_PARTITIONLOCATION;
 TOK_TABLEBUCKETSAMPLE;
 TOK_TABLESPLITSAMPLE;
+TOK_TABLESAMPLEBERNOULLI;
 TOK_TMP_FILE;
 TOK_TABSORTCOLNAMEASC;
 TOK_TABSORTCOLNAMEDESC;
@@ -1372,9 +1373,10 @@ regular_body
    clusterByClause?
    distributeByClause?
    sortByClause?
+   sampleClause?
    limitClause? -> ^(TOK_QUERY fromClause ^(TOK_INSERT insertClause
                      selectClause whereClause? groupByClause? havingClause? orderByClause? clusterByClause?
-                     distributeByClause? sortByClause? limitClause?))
+                     distributeByClause? sortByClause? sampleClause? limitClause?))
    |
    selectStatement
    ;
@@ -1390,9 +1392,10 @@ selectStatement
    clusterByClause?
    distributeByClause?
    sortByClause?
+   sampleClause?
    limitClause? -> ^(TOK_QUERY fromClause ^(TOK_INSERT ^(TOK_DESTINATION ^(TOK_DIR TOK_TMP_FILE))
                      selectClause whereClause? groupByClause? havingClause? orderByClause? clusterByClause?
-                     distributeByClause? sortByClause? limitClause?))
+                     distributeByClause? sortByClause? sampleClause? limitClause?))
    ;
 
 
@@ -1407,9 +1410,10 @@ body
    clusterByClause?
    distributeByClause?
    sortByClause?
+   sampleClause?
    limitClause? -> ^(TOK_INSERT insertClause?
                      selectClause whereClause? groupByClause? havingClause? orderByClause? clusterByClause?
-                     distributeByClause? sortByClause? limitClause?)
+                     distributeByClause? sortByClause? sampleClause? limitClause?)
    |
    selectClause
    whereClause?
@@ -1419,9 +1423,10 @@ body
    clusterByClause?
    distributeByClause?
    sortByClause?
+   sampleClause?
    limitClause? -> ^(TOK_INSERT ^(TOK_DESTINATION ^(TOK_DIR TOK_TMP_FILE))
                      selectClause whereClause? groupByClause? havingClause? orderByClause? clusterByClause?
-                     distributeByClause? sortByClause? limitClause?)
+                     distributeByClause? sortByClause? sampleClause? limitClause?)
    ;
 
 insertClause
@@ -1673,6 +1678,20 @@ splitSample
 @after { msgs.pop(); }
     :
     KW_TABLESAMPLE LPAREN  (numerator=Number) KW_PERCENT RPAREN -> ^(TOK_TABLESPLITSAMPLE $numerator)
+    ;
+
+sampleClause
+@init { msgs.push("sample clause specification"); }
+@after { msgs.pop(); }
+    :
+    bernoulliSample
+    ;
+    
+bernoulliSample
+@init { msgs.push("table sample bernoulli specification"); }
+@after { msgs.pop(); }
+    :
+    KW_TABLESAMPLE KW_BERNOULLI LPAREN  (numerator=Number) KW_PERCENT RPAREN -> ^(TOK_TABLESAMPLEBERNOULLI $numerator)
     ;
 
 tableSample
@@ -2362,7 +2381,7 @@ KW_SHOW_DATABASE: 'SHOW_DATABASE';
 KW_UPDATE: 'UPDATE';
 KW_RESTRICT: 'RESTRICT';
 KW_CASCADE: 'CASCADE';
-
+KW_BERNOULLI: 'BERNOULLI';
 
 // Operators
 // NOTE: if you add a new function/operator, add it to sysFuncNames so that describe function _FUNC_ will work.
